@@ -145,9 +145,10 @@ AnythingLLM is a full-stack workbench that enables you to turn any document, res
 #### 2.1.1 AnythingLLM in Red Hat Openshift AI
 To get started quickly, we will use a custom workbench - a feature offered by Red Hat Openshift AI to quickly host compatible containerized applications as workbench easily. In your organization, you can BYO workbench as well!
   
-  1. Create a new workbench, pick the name of the workbench you have given in the previous step. If you are participating in a workshop and your admin have already set up for you, choose "AnythingLLM".
+  1. Create a new workbench, name it ```AnythingLLM```.
+    ![Image](../img/05/5.0.png)
 
-      ![Image](../img/05/5.2.png)
+  1. Choose "AnythingLLM" image in the image selection section.
 
       <!-- Remember to make your storage name unique to avoid name clash.
       
@@ -199,44 +200,46 @@ AnythingLLM is able to consume inference endpoints from multiple AI provider. In
 
     In production there are more to it. Things like managing the LLM endpoint lifecycle, logs, versioning, automating CICD deployment and even giving a guardrail are extremely important. Red Hat Openshift AI is your one stop platform to implement all these.
 
-### 3. Retrieval Augmented Generation with AnythingLLM 
+### 3. Retrieval Augmented Generation (RAG) 
 RAG, or Retrieval-Augmented Generation, is an AI framework that combines the strengths of traditional information retrieval systems with generative large language models (LLMs). It allows LLMs to access and reference information outside their training data to provide more accurate, up-to-date, and relevant responses. Essentially, RAG enhances LLMs by enabling them to tap into external knowledge sources, like documents, databases, or even the internet, before generating text.
 
 For the purpose of demonstration, we will use a local vector database - LanceDB.
 
 LanceDB is deployed as part of AnythingLLM. You may explore the settings page of AnythingLLM to provide your own vector database.
 
-### 3.1 Scraping Website For RAG
+### 3.1 RAG with AnythingLLM
 You may insert your own pdf, csv or any digestible format for RAG. In this guide, we will step up a notch to scrape website and use its data as RAG. We will use built-in scraper from AnythingLLM, after getting the data, it will chunk it and store in the vector database LanceDB for retrieval.
 
 1. We first ask a question and capture the default response. We'll see the LLM gave us a generic response.
-   > Ask: What is an AI tool from Intel?
-   ![Image](../img/05/5.7.png)
+   > Ask: How much can I claim from a car accident?
+   <!-- ![Image](../img/05/5.7.png) -->
    
    We can see the response is short and very generic.
 
 #### Option 1 : Upload your own data (PDF)
-2. Now lets implement RAG by attaching a pdf ([demo-rag.pdf](../rag-demo.pdf)). Click on the upload button beside your user workspace.
+2. Now lets implement RAG by attaching a pdf ([rag-demo-2.pdf](../rag-demo-2.pdf)). Click on the upload button beside your user workspace.
     ![Image](../img/05/5.7.1-2.png)
-3. Upload the pdf rag-demo.pdf.
+3. Upload the pdf rag-demo-2.pdf.
     ![Image](../img/05/5.7.1.png)
 4. After that, move it to the workspace and click Save and Embed.
     ![Image](../img/05/5.7.2.png)
-5. We can see the answer after RAG is more detailed with reference to the data we uploaded.
+5. Now ask the same question. We can see the answer after RAG is more detailed with reference to the data we uploaded.
     ![Image](../img/05/5.7.3.png)
     >Note: You can verify this by expanding the show citation.
 
+6. You can ask more advanced question like 
+    > Ask: My car is stolen, I see glasses on the floor, how much can I claim? Additionally, while I pick up my favourite labubu doll thrown out by the thief, I slipped and broke my ankle. How much in total I can claim?
 #### Option 2 : Scrapping a website
 
 6. Now let's try another way to implement RAG by scraping a website. The website has a section which has a better answer to our previous question.
 7. Instead of uploading a document, select Data Connector and click bulk link scraper.
     ![Image](../img/05/5.8.png)
 8. Input the link, set the depth to 1 and click Submit.
-   > https://www.redhat.com/en/about/press-releases/red-hat-optimizes-red-hat-ai-speed-enterprise-ai-deployments-across-models-ai-accelerators-and-clouds
+   > https://www.crn.com/news/ai/2025/red-hat-ai-3-promises-partners-more-ways-to-scale-workloads-for-customers
 9. Web scraping will take some time especially with the depth set to a higher value. If you are an admin, you can navigate to the anythingllm pod and see the process of scraping, chunking and embedding.
 10. Once this step is done, you will see the data available. Move it to the workspace, save and embed.
     ![Image](../img/05/5.7.4.png)
-11. After that, ask the question ***What is Red Hat's AI vision?***
+11. After that, ask the question ***What is Red Hat's AI?***
 and you can see the answer is much more detailed and with reference to the scraped website compared to when you have not provide it a data source.
 
 12. In your organization, you can extend this to scrape internal knowledge bases, git repository, configuration playbooks for example.
@@ -286,7 +289,7 @@ Model Context Protocol, MCP is an open standard for AI agents and LLMs to connec
     export MODEL_NAME="qwen3-4b" # Your LLM Model
     ```
     ```shell
-    export MODEL_NAMESPACE="admin-workshop" # Your datascience project name, i.e user50, workshop-test
+    export MODEL_NAMESPACE="userX" # Your datascience project name, i.e user50, workshop-test
     ```
     ```shell
     export LLM_MODEL_TOKEN="YOUR_TOKEN" # Your LLM Model token
@@ -307,7 +310,7 @@ Model Context Protocol, MCP is an open standard for AI agents and LLMs to connec
     ```
     >The first command deploys configmap, the second command deploys the server.
 
-1. Next we will deploy an mcp server. The MCP server can be any thing like Spotify, Uber to Datadog, GitHub. You may also build your own MCP server as well. In this example, we will deploy an Openshift MCP server.
+1. Next we will deploy an mcp server. The MCP server can be any services like Spotify, Uber, Datadog, GitHub, Elastic. You may also build your own MCP server as well. In this example, we will deploy an Openshift MCP server.
 
     ```shell
     oc apply -f obs/llama-stack/openshift-mcp.yaml -n <YOUR_PROJECT_NAMESPACE>
@@ -342,7 +345,7 @@ To do this, we will need to go back to OpenShift AI portal. We will need to modi
     >Note: Qwen3 models use hermes parser. If you are using other LLM models, you may need to modify the parser. Check the foundation model provider docs for more information.
 
     ![Image](../img/07/7.0.7.png)
-1. When the LLM model finish re-deploy, we will be able to test.
+1. When the LLM model finish re-deploy, we will be able to test. It will take 5 - 10 minutes depending on your model size!
 
 ### 4.3 Test and interact with your LLM model with tool call capability
 
@@ -364,7 +367,7 @@ To do this, we will need to go back to OpenShift AI portal. We will need to modi
 > Your MCP server currently can only access it's own namespace. </br></br>
 > To implement cluster wide read-only acccess, apply the following:
 </br></br>
-> ONLY Admin can do this.
+> ONLY Admin can do this. If you are joining a workshop, skip this as your admin might have already done this for you.
 ```shell
 oc apply -f obs/experimental/openshift-mcp/cluster-read-serviceaccount.yaml
 ```
@@ -388,7 +391,7 @@ To deploy llama-stack playground, follow on. The playground is a streamlit based
     export LLM_MODEL_URL="https://${MODEL_NAME}-predictor.${MODEL_NAMESPACE}.svc.cluster.local:8443/v1"
     ```
     ```shell
-    oc apply -f obs/llama-stack/playground.yaml -n user49 -n <YOUR_PROJECT_NAMESPACE>
+    oc apply -f obs/llama-stack/playground.yaml -n <YOUR_PROJECT_NAMESPACE>
     ```
 1. Ensure that no errors and all the pods are running.
     ```shell
