@@ -437,8 +437,9 @@ oc apply -f obs/grafana-user-setup.yaml -n YOUR_PROJECT_NAME
 2. Get the Grafana route URL:
 
 ```
-oc get route grafana -o jsonpath='https://{.spec.host}{"\n"}'
+oc get route grafana -o jsonpath='https://{.spec.host}{"\n"}' -n userX
 ```
+> Remember to change to your namespace to get your grafana route. eg user9, user55
 > Grafana takes a while to deploy. Do wait a few minutes.
 3. To check status, run
 ```
